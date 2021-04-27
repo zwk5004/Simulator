@@ -1,0 +1,9 @@
+# IDE Configs
+/.idea/
+
+# Output
+/out/
+
+# IDE File
+Simulator.iml
+
