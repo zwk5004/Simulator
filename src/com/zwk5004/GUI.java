@@ -1,5 +1,8 @@
 package com.zwk5004;
 
+import ActionListners.run_ActionListener;
+import Inputs.Read;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -19,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.util.List;
 import java.util.Map;
 
 public class GUI {
@@ -62,8 +66,11 @@ public class GUI {
             this.runButton.setVisible(true);
         });
 
-        String[] machines = new String[]{"HiSeq 2000", "HiSeq 3000", "MiSeq", "Sanger", "PacBio", "Ion Torrent"};
+        String[] machines = new String[]{"HiSeq2000", "HiSeq3000", "hiSeq", "Sanger", "PacBio", "IonTorrent"};
         machineSelect = new JComboBox<>(machines);
+
+        //machineSelect.addActionListener(new run_ActionListener(this));
+
         String[] sequenceTypes = new String[]{"DNA", "RNA", "mRNA"};
         typeSelect = new JComboBox<>(sequenceTypes);
         String[] rackSizes = new String[]{"16", "32", "64", "100", "144", "288"};
@@ -162,5 +169,28 @@ public class GUI {
         tempBar.setValue(((int) (Math.random() * 100)));
         tempBar.setStringPainted(true);
         return tempBar;
+    }
+
+    public void run(){
+        String machine = machineSelect.getItemAt(machineSelect.getSelectedIndex());
+        String sequenceType = typeSelect.getItemAt(typeSelect.getSelectedIndex());
+        int rackSize = Integer.parseInt(rackSizeSelect.getItemAt(rackSizeSelect.getSelectedIndex()));
+        int totalSamples = Integer.parseInt(numSamplesInput.getText());
+        int totalRacks = totalSamples/rackSize;
+        Read file = new Read();
+        // Everytime we hit run:
+        // Created the samples and the racks
+        for(int i = 0; i < totalRacks; i++){
+            Rack rack = new Rack(PRIORITY);
+            List<Sample> sampleL = new List;
+            for(int j = 0; j < totalSamples; j++){
+                sampleL.add(new Sample(ID).setSequence(file.getSequence(sequenceType, SEQUENCESIZE)));
+            }
+            rack.addSamples(sampleL);
+        }
+
+        // Create a new Simulation, crseate the selected machine & add the racks to the machine
+
+
     }
 }
