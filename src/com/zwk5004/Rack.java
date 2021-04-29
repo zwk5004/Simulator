@@ -20,6 +20,7 @@ public class Rack {
     }
 
     public void process(){
-
+        // TODO: Maybe have to do more than just incrementing the progress here
+        progress++;
     }
 }

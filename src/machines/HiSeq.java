@@ -1,4 +1,4 @@
 package machines;
 
-public class HiSeq extends AbsMachine  {
+public abstract class HiSeq extends AbsMachine  {
 }
