@@ -18,6 +18,6 @@ public class DNASequencer extends AbsSequencer {
 
     @Override
     public void setSample(String sample) {
-
+        super.sample = sample;
     }
 }

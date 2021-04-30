@@ -18,6 +18,9 @@ public class Rack {
     public void addSamples(List<Sample> samples){
         this.samples.addAll(samples);
     }
+    public List<Sample> getSamples(){
+        return samples;
+    }
 
     public void process(){
         // TODO: Maybe have to do more than just incrementing the progress here

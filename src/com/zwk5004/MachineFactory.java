@@ -3,7 +3,7 @@ package com.zwk5004;
 import machines.*;
 
 public class MachineFactory {
-    public AbsMachine loadMachine(String name) {
+    public AbsMachine loadMachine(String name, String type) {
         switch (name) {
             case "HiSeq2000":
                 return new HiSeq2000();

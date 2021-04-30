@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -178,16 +179,20 @@ public class GUI {
         int totalSamples = Integer.parseInt(numSamplesInput.getText());
         int totalRacks = totalSamples/rackSize;
         Read file = new Read();
+
+
         // Create a new Simulation, create the selected machine
-        Simulator simulator = new Simulator(machine);
+        Simulator simulator = new Simulator(machine, sequenceType);
         // Everytime we hit run:
         // TODO: Figure out priority, figure out ID, Define machines to use sequence method and select filter class method
         // Created the samples and the racks
         for(int i = 0; i < totalRacks; i++){
             Rack rack = new Rack(PRIORITY);
-            List<Sample> sampleL = new List;
+            ArrayList<Sample> sampleL = new ArrayList<>();
             for(int j = 0; j < totalSamples; j++){
-                sampleL.add(new Sample(ID).setSequence(file.getSequence(sequenceType, 25000)));
+                Sample newSample = new Sample(Integer.parseInt(String.valueOf(i) + String.valueOf(j)));
+                newSample.setSequence(file.getSequence(sequenceType, 25000));
+                sampleL.add(newSample);
             }
             rack.addSamples(sampleL);
             //add the racks to the machine
