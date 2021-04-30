@@ -15,6 +15,6 @@ public class Simulator {
     }
 
     public void run(){
-
+        this.machine.process();
     }
 }

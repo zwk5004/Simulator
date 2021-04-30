@@ -1,6 +1,10 @@
 package machines;
 
 public class HiSeq2000 extends HiSeq {
+
+    public HiSeq2000(String type){
+        super(type);
+    }
     @Override
     public void output() {
         // TODO: Output to FASTQ file.  Basically just a text file with a different extension.  Top row is below, most of it is random data

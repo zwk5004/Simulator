@@ -1,6 +1,10 @@
 package machines;
 
 public class PacBio extends AbsMachine  {
+
+    public PacBio(String type){
+        super(type);
+    }
     @Override
     public void output() {
         // TODO: Output to FASTA file. Different from FASTQ. Basically just a text file with a different extension.  Top row is below, most of it is random data

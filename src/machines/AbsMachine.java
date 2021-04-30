@@ -49,6 +49,7 @@ public abstract class AbsMachine {
         for(Rack rack : racks){
             for(Sample sample : rack.getSamples()){
                 sequencer.setSample(sample.getSequence());
+                // TODO: grab the output from the below statement as the sequenced output
                 // The output will be here!!!!! = sequencer.sequence()
             }
         }

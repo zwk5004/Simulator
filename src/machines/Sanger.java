@@ -2,6 +2,10 @@ package machines;
 
 public class Sanger extends AbsMachine {
 
+    public Sanger(String type){
+        super(type);
+    }
+
     @Override
     public void output() {
         // TODO: Output to FASTQ file.  Basically just a text file with a different extension.  Top row is below, most of it is random data
