@@ -5,7 +5,7 @@ import java.util.List;
 public class Rack {
     private List<Sample> samples;
     private int priority;
-    private int progress;
+    private int progress = 0;
 
     public Rack(int priority){
         this.priority = priority;

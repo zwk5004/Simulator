@@ -178,18 +178,23 @@ public class GUI {
         int totalSamples = Integer.parseInt(numSamplesInput.getText());
         int totalRacks = totalSamples/rackSize;
         Read file = new Read();
+        // Create a new Simulation, create the selected machine
+        Simulator simulator = new Simulator(machine);
         // Everytime we hit run:
+        // TODO: Figure out priority, figure out ID, Define machines to use sequence method and select filter class method
         // Created the samples and the racks
         for(int i = 0; i < totalRacks; i++){
             Rack rack = new Rack(PRIORITY);
             List<Sample> sampleL = new List;
             for(int j = 0; j < totalSamples; j++){
-                sampleL.add(new Sample(ID).setSequence(file.getSequence(sequenceType, SEQUENCESIZE)));
+                sampleL.add(new Sample(ID).setSequence(file.getSequence(sequenceType, 25000)));
             }
             rack.addSamples(sampleL);
+            //add the racks to the machine
+            simulator.addRack(rack);
         }
 
-        // Create a new Simulation, crseate the selected machine & add the racks to the machine
+
 
 
     }

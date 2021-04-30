@@ -12,8 +12,8 @@ public abstract class AbsMachine {
     private int samplePerRack;
     private SequencerIF sequencer;
 
-    public void loadRacks(){
-
+    public void loadRacks(Rack racks){
+        this.racks.add(racks);
     }
 
     public String getType(){

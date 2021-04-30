@@ -4,14 +4,14 @@ import javafx.collections.ObservableArrayBase;
 import machines.AbsMachine;
 
 public class Simulator {
-    private MachineFactory machine = new MachineFactory();
+    private AbsMachine machine;
 
-    public Simulator(AbsMachine machine){
-
+    public Simulator(String machine){
+        this.machine =  new MachineFactory().loadMachine(machine);
     }
 
     public void addRack(Rack rack){
-
+        this.machine.loadRacks(rack);
     }
 
     public void run(){
