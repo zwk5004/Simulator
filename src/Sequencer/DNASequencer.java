@@ -10,7 +10,7 @@ public class DNASequencer extends AbsSequencer {
         // Generate X Number of characters for a string.
         // Characters should be random of A-C-G-T
         StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < 25000; i++){
+        for(int i = 0; i < 250000; i++){
             builder.append(this.bases[random.nextInt(4)]);
         }
         return builder.toString();

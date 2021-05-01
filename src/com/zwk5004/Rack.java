@@ -1,9 +1,10 @@
 package com.zwk5004;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Rack {
-    private List<Sample> samples;
+    private List<Sample> samples = new ArrayList<>();
     private int priority;
     private int progress = 0;
 
@@ -24,6 +25,10 @@ public class Rack {
     }
     public List<Sample> getSamples(){
         return samples;
+    }
+
+    public int getProgress() {
+        return progress;
     }
 
     public void process(){

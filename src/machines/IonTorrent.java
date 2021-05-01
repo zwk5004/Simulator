@@ -47,4 +47,19 @@ public class IonTorrent extends AbsMachine  {
     public String getMachineName() {
         return "Ion Torrent";
     }
+
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[]{"DNA"};
+    }
+
+    @Override
+    public String[] getSupportedRackSize() {
+        return new String[]{"16", "32", "64"};
+    }
+
+    @Override
+    public int getMaxSamples() {
+        return 6000;
+    }
 }

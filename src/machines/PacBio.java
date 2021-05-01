@@ -51,4 +51,19 @@ public class PacBio extends AbsMachine  {
     public String getMachineName() {
         return "PacBio";
     }
+
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[]{"DNA", "RNA"};
+    }
+
+    @Override
+    public String[] getSupportedRackSize() {
+        return new String[]{"32", "64", "100"};
+    }
+
+    @Override
+    public int getMaxSamples() {
+        return 5000;
+    }
 }

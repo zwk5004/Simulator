@@ -49,4 +49,19 @@ public class Sanger extends AbsMachine {
     public String getMachineName() {
         return "Sanger";
     }
+
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[]{"DNA", "mRNA"};
+    }
+
+    @Override
+    public String[] getSupportedRackSize() {
+        return new String[]{"32", "64"};
+    }
+
+    @Override
+    public int getMaxSamples() {
+        return 4000;
+    }
 }

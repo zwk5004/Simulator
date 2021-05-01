@@ -54,4 +54,19 @@ public class HiSeq3000 extends HiSeq {
     public String getMachineName() {
         return "HiSeq 3000";
     }
+
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[]{"DNA", "RNA", "mRNA"};
+    }
+
+    @Override
+    public String[] getSupportedRackSize() {
+        return new String[]{"16", "32", "64", "100", "144", "288"};
+    }
+
+    @Override
+    public int getMaxSamples() {
+        return 20000;
+    }
 }

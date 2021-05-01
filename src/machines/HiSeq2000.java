@@ -37,8 +37,10 @@ public class HiSeq2000 extends HiSeq {
             bw.newLine();
             for (Rack rack : racks) {
                 for (Sample sample : rack.getSamples()) {
-                    bw.write(sample.getSequence());
-                    bw.newLine();
+                    if (sample != null && sample.getSequence() != null) {
+                        bw.write(sample.getSequence());
+                        bw.newLine();
+                    }
                 }
             }
             bw.write("+");
@@ -53,5 +55,20 @@ public class HiSeq2000 extends HiSeq {
     @Override
     public String getMachineName() {
         return "HiSeq 2000";
+    }
+
+    @Override
+    public String[] getSupportedTypes() {
+        return new String[]{"DNA"};
+    }
+
+    @Override
+    public String[] getSupportedRackSize() {
+        return new String[]{"16", "32", "64", "100"};
+    }
+
+    @Override
+    public int getMaxSamples() {
+        return 2000;
     }
 }

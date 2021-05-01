@@ -7,6 +7,8 @@ import Sequencer.mRNASequencer;
 import com.zwk5004.Rack;
 import com.zwk5004.Sample;
 
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,11 +19,9 @@ import java.util.Observer;
 
 public abstract class AbsMachine extends Thread implements Observer {
     private String type;
-    private boolean running;
-    protected String location;
-    protected List<Rack> racks;
-    private int totalRacks;
-    private int samplePerRack;
+    protected String location = "";
+    protected List<Rack> racks = new ArrayList<>();
+    private List<JProgressBar> progressBars;
     private SequencerIF sequencer;
 
     public AbsMachine(String type){
@@ -54,7 +54,11 @@ public abstract class AbsMachine extends Thread implements Observer {
         this.location = location;
     }
 
-    public void process() {
+    public void setProgressBars(List<JProgressBar> bars) {
+        this.progressBars = bars;
+    }
+
+    public void process() throws InterruptedException {
         // select the correct sequencer filter, and start processing samples on the racks
         List<Map<Sample, Rack>> sampleList = new LinkedList<>();
 
@@ -83,6 +87,19 @@ public abstract class AbsMachine extends Thread implements Observer {
             Rack rack = sampleMap.get(sample);
             sample.setSequence(sequencer.sequence());
             rack.process();
+            Thread.sleep(250);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    int idx = 0;
+                    for (Rack rack : racks) {
+                        double progress = 100 * ((double)rack.getProgress() / (double)rack.getSamples().size());
+                        progressBars.get(idx).setValue((int)progress);
+                        progressBars.get(idx).update(progressBars.get(idx).getGraphics());
+                        idx++;
+                    }
+                }
+            });
         }
     }
 
@@ -91,7 +108,16 @@ public abstract class AbsMachine extends Thread implements Observer {
     }
 
     public void run() {
-        process();
+        try {
+            process();
+            output();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Rack> getRacks() {
+        return racks;
     }
 
     @Override
@@ -103,4 +129,10 @@ public abstract class AbsMachine extends Thread implements Observer {
     public abstract void output();
 
     public abstract String getMachineName();
+
+    public abstract String[] getSupportedTypes();
+
+    public abstract String[] getSupportedRackSize();
+
+    public abstract int getMaxSamples();
 }

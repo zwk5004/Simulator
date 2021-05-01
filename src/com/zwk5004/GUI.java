@@ -1,12 +1,12 @@
 package com.zwk5004;
 
-import ActionListners.run_ActionListener;
-import Inputs.Read;
+import machines.AbsMachine;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,6 +18,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -27,15 +29,19 @@ import java.util.List;
 import java.util.Map;
 
 public class GUI {
+    Simulator simulator;
     JFrame frame;
     JLabel machineLabel, typeLabel, rackSizeLabel, numSamplesLabel, machineInfoLabel,
-            supportedTypesLabel, maxRacksLabel, maxSamplesLabel;
+            supportedTypesLabel, supportedRacksLabel, maxSamplesLabel;
     JComboBox<String> machineSelect, typeSelect, rackSizeSelect;
+    JPanel mainPanel, progressPanel;
     JTextField numSamplesInput;
     JButton runButton, cancelButton;
-    JProgressBar progressBar1, progressBar2, progressBar3, progressBar4, progressBar5, progressBar6;
-    JLabel progressLabel1, progressLabel2, progressLabel3, progressLabel4, progressLabel5, progressLabel6;
+    JDialog modalDialog;
+    List<JProgressBar> progressBars;
+    List<JLabel> progressLabels;
     boolean isRunning = false;
+    AbsMachine selectedMachine;
 
     public GUI (){
         frame = new JFrame();
@@ -51,13 +57,14 @@ public class GUI {
         attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
         machineInfoLabel.setFont(font.deriveFont(attributes));
         supportedTypesLabel = new JLabel("Supported Types: DNA, RNA, mRNA");
-        maxRacksLabel = new JLabel("Max Racks: 20");
+        supportedRacksLabel = new JLabel("Max Racks: 20");
         maxSamplesLabel = new JLabel("Max Samples: 2880");
         runButton = new JButton("Run");
         runButton.addActionListener(e -> {
-            isRunning = true;
-            this.runButton.setVisible(false);
-            this.cancelButton.setVisible(true);
+            // isRunning = true;
+            // this.runButton.setVisible(false);
+            // this.cancelButton.setVisible(true);
+            clickRun();
         });
         cancelButton = new JButton("Cancel");
         cancelButton.setVisible(false);
@@ -65,12 +72,28 @@ public class GUI {
             isRunning = false;
             this.cancelButton.setVisible(false);
             this.runButton.setVisible(true);
+            simulator.cancel();
         });
 
-        String[] machines = new String[]{"HiSeq2000", "HiSeq3000", "hiSeq", "Sanger", "PacBio", "IonTorrent"};
+        String[] machines = new String[]{"HiSeq2000", "HiSeq3000", "Sanger", "PacBio", "IonTorrent"};
         machineSelect = new JComboBox<>(machines);
 
-        //machineSelect.addActionListener(new run_ActionListener(this));
+        machineSelect.addActionListener(e -> {
+            if (machineSelect.getSelectedItem() != null) {
+                selectedMachine = MachineFactory.loadMachine((String) machineSelect.getSelectedItem(), "");
+                supportedTypesLabel.setText("Supported Types: " + String.join(",", selectedMachine.getSupportedTypes()));
+                typeSelect.removeAllItems();
+                for (String type : selectedMachine.getSupportedTypes()) {
+                    typeSelect.addItem(type);
+                }
+                supportedRacksLabel.setText("Supported Racks: " + String.join(",", selectedMachine.getSupportedRackSize()));
+                rackSizeSelect.removeAllItems();
+                for (String rackSize : selectedMachine.getSupportedRackSize()) {
+                    rackSizeSelect.addItem(rackSize);
+                }
+                maxSamplesLabel.setText("Max Samples: " + selectedMachine.getMaxSamples());
+            }
+        });
 
         String[] sequenceTypes = new String[]{"DNA", "RNA", "mRNA"};
         typeSelect = new JComboBox<>(sequenceTypes);
@@ -79,7 +102,7 @@ public class GUI {
         numSamplesInput = new JTextField("", 10);
         numSamplesInput.setSize(100, 14);
 
-        JPanel mainPanel = new JPanel();
+        mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
         JPanel headerPanel = new JPanel();
@@ -116,48 +139,17 @@ public class GUI {
 
         machineInfoPanel.add(machineInfoLabel);
         machineInfoPanel.add(supportedTypesLabel);
-        machineInfoPanel.add(maxRacksLabel);
+        machineInfoPanel.add(supportedRacksLabel);
         machineInfoPanel.add(maxSamplesLabel);
 
         headerPanel.add(topPanel);
         headerPanel.add(machineInfoPanel);
 
-        JPanel progressPanel = new JPanel();
+        progressPanel = new JPanel();
         progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.PAGE_AXIS));
-        progressBar1 = createProgressBar();
-        progressBar2 = createProgressBar();
-        progressBar3 = createProgressBar();
-        progressBar4 = createProgressBar();
-        progressBar5 = createProgressBar();
-        progressBar6 = createProgressBar();
-        progressLabel1 = new JLabel("Rack 1", SwingConstants.LEADING);
-        progressLabel1.setFont(new Font(null, Font.PLAIN, 16));
-        progressLabel2 = new JLabel("Rack 2", SwingConstants.LEADING);
-        progressLabel2.setFont(new Font(null, Font.PLAIN, 16));
-        progressLabel3 = new JLabel("Rack 3", SwingConstants.LEADING);
-        progressLabel3.setFont(new Font(null, Font.PLAIN, 16));
-        progressLabel4 = new JLabel("Rack 4", SwingConstants.LEADING);
-        progressLabel4.setFont(new Font(null, Font.PLAIN, 16));
-        progressLabel5 = new JLabel("Rack 5", SwingConstants.LEADING);
-        progressLabel5.setFont(new Font(null, Font.PLAIN, 16));
-        progressLabel6 = new JLabel("Rack 6", SwingConstants.LEADING);
-        progressLabel6.setFont(new Font(null, Font.PLAIN, 16));
-
-        progressPanel.add(progressLabel1);
-        progressPanel.add(progressBar1);
-        progressPanel.add(progressLabel2);
-        progressPanel.add(progressBar2);
-        progressPanel.add(progressLabel3);
-        progressPanel.add(progressBar3);
-        progressPanel.add(progressLabel4);
-        progressPanel.add(progressBar4);
-        progressPanel.add(progressLabel5);
-        progressPanel.add(progressBar5);
-        progressPanel.add(progressLabel6);
-        progressPanel.add(progressBar6);
 
         mainPanel.add(headerPanel, BorderLayout.PAGE_START);
-        mainPanel.add(progressPanel, BorderLayout.CENTER);
+        mainPanel.add(progressPanel);
 
         frame.add(mainPanel);
 
@@ -165,43 +157,93 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    private JProgressBar createProgressBar() {
-        JProgressBar tempBar = new JProgressBar(0, 100);
-        tempBar.setValue(((int) (Math.random() * 100)));
-        tempBar.setStringPainted(true);
-        return tempBar;
+    public void clickRun() {
+        this.runButton.setVisible(false);
+        this.cancelButton.setVisible(true);
+        modalDialog = new JDialog(frame, "Rack Priority", Dialog.ModalityType.DOCUMENT_MODAL);
+        modalDialog.setBounds(132, 132, 300, 500);
+        Container dialogContainer = modalDialog.getContentPane();
+        dialogContainer.setLayout(new BoxLayout(dialogContainer, BoxLayout.PAGE_AXIS));
+        dialogContainer.add(new JLabel("Enter in the priority for each rack.  Default is 1."));
+        double rackSize = Double.parseDouble(rackSizeSelect.getItemAt(rackSizeSelect.getSelectedIndex()));
+        double totalSamples = Double.parseDouble(numSamplesInput.getText());
+        int totalRacks = (int)Math.ceil(totalSamples/rackSize);
+        List<JTextField> rackPriorities = new ArrayList<>();
+        progressBars = new ArrayList<>();
+        progressLabels = new ArrayList<>();
+        for (int i = 0; i < totalRacks; i++) {
+            JPanel panel = new JPanel();
+            panel.setLayout(new FlowLayout());
+            panel.add(new JLabel("Rack " + (i+1)));
+            JTextField rackPriority = new JTextField("1", 10);
+            panel.add(rackPriority);
+            rackPriorities.add(rackPriority);
+            dialogContainer.add(panel);
+            JLabel progressLabel = new JLabel("Rack " + (i+1), SwingConstants.LEADING);
+            progressLabel.setFont(new Font(null, Font.PLAIN, 16));
+            JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setStringPainted(true);
+            progressLabels.add(progressLabel);
+            progressBars.add(progressBar);
+        }
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(e -> {
+            modalDialog.setVisible(false);
+        });
+        JButton run = new JButton("Run");
+        run.addActionListener(e -> {
+            modalDialog.setVisible(false);
+            run(rackPriorities);
+        });
+        dialogContainer.add(cancel);
+        dialogContainer.add(run);
+        modalDialog.setVisible(true);
+        for (int k = 0; k < totalRacks; k++) {
+            progressPanel.add(progressLabels.get(k));
+            progressPanel.add(progressBars.get(k));
+        }
+        mainPanel.add(progressPanel, BorderLayout.CENTER);
+        mainPanel.updateUI();
     }
 
-    public void run(){
+    public void run(List<JTextField> rackPriorities){
         String machine = machineSelect.getItemAt(machineSelect.getSelectedIndex());
         String sequenceType = typeSelect.getItemAt(typeSelect.getSelectedIndex());
         int rackSize = Integer.parseInt(rackSizeSelect.getItemAt(rackSizeSelect.getSelectedIndex()));
-        int totalSamples = Integer.parseInt(numSamplesInput.getText());
-        int totalRacks = totalSamples/rackSize;
-        Read read = new Read();
-
+        int samplesLeft = Integer.parseInt(numSamplesInput.getText());
+        List<Rack> racks = new ArrayList<>();
 
         // Create a new Simulation, create the selected machine, passing the sequence type to also pick the filter when loading the machine
-        Simulator simulator = new Simulator(machine, sequenceType);
+        simulator = new Simulator(machine, sequenceType);
+        simulator.alignProgressBars(progressBars);
         // Everytime we hit run:
-        // TODO: Figure out priority, Define machines to use sequence method and select filter class method
         // Created the samples and the racks
-        for(int i = 0; i < totalRacks; i++){
-            Rack rack = new Rack(0);
-            ArrayList<Sample> sampleL = new ArrayList<>();
-            for(int j = 0; j < totalSamples; j++){
-                Sample newSample = new Sample(Integer.parseInt(String.valueOf(i) + String.valueOf(j)));
-                newSample.setSequence(read.getSequence(sequenceType, 25000));
-                sampleL.add(newSample);
+        int rackIdx = 0;
+        for (JTextField rackPriorityField: rackPriorities) {
+            Rack rack = new Rack(getPriorityFromField(rackPriorityField));
+            int limit = Math.min(rackSize, samplesLeft);
+            for (int j = 0; j < limit; j++) {
+                long id = ((long) rackIdx * rackSize) + j;
+                Sample sample = new Sample(id);
+                rack.addSample(sample);
+                samplesLeft--;
             }
-            rack.addSamples(sampleL);
-            //add the racks to the machine
-            simulator.addRack(rack);
+            racks.add(rack);
+            rackIdx++;
         }
 
+        racks.forEach(simulator::addRack);
+
         simulator.run();
+    }
 
-
-
+    private int getPriorityFromField(JTextField field) {
+        String text = field.getText();
+        try {
+            return Integer.parseInt(text);
+        } catch (Exception e) {
+            // do nothing
+        }
+        return 1;
     }
 }
