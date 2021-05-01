@@ -87,15 +87,17 @@ public abstract class AbsMachine extends Thread implements Observer {
             Rack rack = sampleMap.get(sample);
             sample.setSequence(sequencer.sequence());
             rack.process();
-            Thread.sleep(250);
+            //Thread.sleep(250);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     int idx = 0;
                     for (Rack rack : racks) {
-                        double progress = 100 * ((double)rack.getProgress() / (double)rack.getSamples().size());
-                        progressBars.get(idx).setValue((int)progress);
-                        progressBars.get(idx).update(progressBars.get(idx).getGraphics());
+                        if (progressBars.get(idx).getValue() < 100) {
+                            double progress = 100 * ((double) rack.getProgress() / (double) rack.getSamples().size());
+                            progressBars.get(idx).setValue((int) progress);
+                            progressBars.get(idx).update(progressBars.get(idx).getGraphics());
+                        }
                         idx++;
                     }
                 }

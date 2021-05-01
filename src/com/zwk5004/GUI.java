@@ -7,6 +7,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +38,12 @@ public class GUI {
     JComboBox<String> machineSelect, typeSelect, rackSizeSelect;
     JPanel mainPanel, progressPanel;
     JTextField numSamplesInput;
+    JFileChooser fileChooser;
     JButton runButton, cancelButton;
     JDialog modalDialog;
     List<JProgressBar> progressBars;
     List<JLabel> progressLabels;
     boolean isRunning = false;
-    AbsMachine selectedMachine;
 
     public GUI (){
         frame = new JFrame();
@@ -61,9 +63,6 @@ public class GUI {
         maxSamplesLabel = new JLabel("Max Samples: 2880");
         runButton = new JButton("Run");
         runButton.addActionListener(e -> {
-            // isRunning = true;
-            // this.runButton.setVisible(false);
-            // this.cancelButton.setVisible(true);
             clickRun();
         });
         cancelButton = new JButton("Cancel");
@@ -80,7 +79,7 @@ public class GUI {
 
         machineSelect.addActionListener(e -> {
             if (machineSelect.getSelectedItem() != null) {
-                selectedMachine = MachineFactory.loadMachine((String) machineSelect.getSelectedItem(), "");
+                AbsMachine selectedMachine = MachineFactory.loadMachine((String) machineSelect.getSelectedItem(), "");
                 supportedTypesLabel.setText("Supported Types: " + String.join(",", selectedMachine.getSupportedTypes()));
                 typeSelect.removeAllItems();
                 for (String type : selectedMachine.getSupportedTypes()) {
@@ -216,6 +215,16 @@ public class GUI {
         // Create a new Simulation, create the selected machine, passing the sequence type to also pick the filter when loading the machine
         simulator = new Simulator(machine, sequenceType);
         simulator.alignProgressBars(progressBars);
+        fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        File locationDirectory = null;
+        int option = fileChooser.showOpenDialog(frame);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            locationDirectory = fileChooser.getSelectedFile();
+        }
+        if (locationDirectory != null) {
+            simulator.getMachine().setLocation(locationDirectory.getAbsolutePath());
+        }
         // Everytime we hit run:
         // Created the samples and the racks
         int rackIdx = 0;
