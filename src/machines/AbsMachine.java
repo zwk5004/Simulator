@@ -7,11 +7,18 @@ import Sequencer.mRNASequencer;
 import com.zwk5004.Rack;
 import com.zwk5004.Sample;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
-public abstract class AbsMachine {
+public abstract class AbsMachine extends Thread implements Observer {
     private String type;
-    private String name;
+    private boolean running;
+    protected String location;
     protected List<Rack> racks;
     private int totalRacks;
     private int samplePerRack;
@@ -40,23 +47,60 @@ public abstract class AbsMachine {
         return this.type;
     }
 
-    public String getName(){
-        return this.name;
+    public void setLocation(String location) {
+        if (!location.endsWith("/")) {
+            location += "/";
+        }
+        this.location = location;
     }
 
     public void process() {
-        // TODO: select the correct sequencer filter, and start processing samples on the racks
+        // select the correct sequencer filter, and start processing samples on the racks
+        List<Map<Sample, Rack>> sampleList = new LinkedList<>();
+
         for(Rack rack : racks){
+            int i = 1;
             for(Sample sample : rack.getSamples()){
-                sequencer.setSample(sample.getSequence());
-                // TODO: grab the output from the below statement as the sequenced output
-                // The output will be here!!!!! = sequencer.sequence()
+                // grab the output from the below statement as the sequenced output
+                // sample.setSequence(sequencer.sequence());
+                // rack.process();
+                int samplePriority = calculateSamplePriority(i, rack);
+                sample.setSamplePriority(samplePriority);
+                Map<Sample, Rack> sampleToRack = new HashMap<>();
+                sampleToRack.put(sample, rack);
+                sampleList.add(sampleToRack);
+                sampleList.sort((mapA, mapB) -> {
+                    Sample a = new ArrayList<>(mapA.keySet()).get(0);
+                    Sample b = new ArrayList<>(mapB.keySet()).get(0);
+                    return a.getSamplePriority() - b.getSamplePriority();
+                });
+                i++;
             }
         }
-        // Call output from the implemented classes
+
+        for (Map<Sample, Rack> sampleMap : sampleList) {
+            Sample sample = new ArrayList<>(sampleMap.keySet()).get(0);
+            Rack rack = sampleMap.get(sample);
+            sample.setSequence(sequencer.sequence());
+            rack.process();
+        }
+    }
+
+    private int calculateSamplePriority(int sampleIdx, Rack rack) {
+        return sampleIdx * rack.getPriority();
+    }
+
+    public void run() {
+        process();
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
         output();
     }
 
-    // TODO: This needs to output the file for the samples since the "processing" is done by the filter
+    // This needs to output the file for the samples since the "processing" is done by the filter
     public abstract void output();
+
+    public abstract String getMachineName();
 }

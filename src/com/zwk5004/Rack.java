@@ -15,6 +15,10 @@ public class Rack {
         this.samples.add(sample);
     }
 
+    public int getPriority() {
+        return this.priority;
+    }
+
     public void addSamples(List<Sample> samples){
         this.samples.addAll(samples);
     }

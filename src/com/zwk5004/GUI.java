@@ -187,7 +187,7 @@ public class GUI {
         // TODO: Figure out priority, Define machines to use sequence method and select filter class method
         // Created the samples and the racks
         for(int i = 0; i < totalRacks; i++){
-            Rack rack = new Rack(PRIORITY);
+            Rack rack = new Rack(0);
             ArrayList<Sample> sampleL = new ArrayList<>();
             for(int j = 0; j < totalSamples; j++){
                 Sample newSample = new Sample(Integer.parseInt(String.valueOf(i) + String.valueOf(j)));

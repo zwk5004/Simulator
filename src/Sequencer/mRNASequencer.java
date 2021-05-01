@@ -7,13 +7,12 @@ public class mRNASequencer extends AbsSequencer {
 
     @Override
     public String sequence() {
-        // TODO: Process the sequence for mRNA
         // A becomes U, U becomes A, C becomes G, G becomes C
-        return super.sequencer.sequence();
-    }
-
-    @Override
-    public void setSample(String sample) {
-        super.sequencer.setSample(sample);
+        String mRNA = super.sequencer.sequence();
+        mRNA = mRNA.replaceAll("A", "U");
+        mRNA = mRNA.replaceAll("U", "A");
+        mRNA = mRNA.replaceAll("C", "G");
+        mRNA = mRNA.replaceAll("G", "C");
+        return mRNA;
     }
 }

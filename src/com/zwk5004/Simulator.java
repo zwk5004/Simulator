@@ -1,9 +1,10 @@
 package com.zwk5004;
 
-import javafx.collections.ObservableArrayBase;
 import machines.AbsMachine;
 
-public class Simulator {
+import java.util.Observable;
+
+public class Simulator extends Observable {
     private AbsMachine machine;
 
     public Simulator(String machine, String type){
@@ -15,6 +16,11 @@ public class Simulator {
     }
 
     public void run(){
-        this.machine.process();
+        this.machine.start();
+    }
+
+    public void cancel() {
+        this.machine.stop();
+        notifyObservers();
     }
 }
