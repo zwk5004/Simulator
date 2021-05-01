@@ -12,11 +12,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
+import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -148,7 +150,6 @@ public class GUI {
         progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.PAGE_AXIS));
 
         mainPanel.add(headerPanel, BorderLayout.PAGE_START);
-        mainPanel.add(progressPanel);
 
         frame.add(mainPanel);
 
@@ -160,7 +161,7 @@ public class GUI {
         this.runButton.setVisible(false);
         this.cancelButton.setVisible(true);
         modalDialog = new JDialog(frame, "Rack Priority", Dialog.ModalityType.DOCUMENT_MODAL);
-        modalDialog.setBounds(132, 132, 300, 500);
+        modalDialog.setBounds(132, 132, 500, 500);
         Container dialogContainer = modalDialog.getContentPane();
         dialogContainer.setLayout(new BoxLayout(dialogContainer, BoxLayout.PAGE_AXIS));
         dialogContainer.add(new JLabel("Enter in the priority for each rack.  Default is 1."));
@@ -170,6 +171,10 @@ public class GUI {
         List<JTextField> rackPriorities = new ArrayList<>();
         progressBars = new ArrayList<>();
         progressLabels = new ArrayList<>();
+        JPanel dialogPanel = new JPanel();
+        dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.PAGE_AXIS));
+        //dialogPanel.setPreferredSize(new Dimension(500, 800));
+        JScrollPane dialogScrollPane = new JScrollPane(dialogPanel);
         for (int i = 0; i < totalRacks; i++) {
             JPanel panel = new JPanel();
             panel.setLayout(new FlowLayout());
@@ -177,7 +182,7 @@ public class GUI {
             JTextField rackPriority = new JTextField("1", 10);
             panel.add(rackPriority);
             rackPriorities.add(rackPriority);
-            dialogContainer.add(panel);
+            dialogPanel.add(panel);
             JLabel progressLabel = new JLabel("Rack " + (i+1), SwingConstants.LEADING);
             progressLabel.setFont(new Font(null, Font.PLAIN, 16));
             JProgressBar progressBar = new JProgressBar(0, 100);
@@ -194,6 +199,7 @@ public class GUI {
             modalDialog.setVisible(false);
             run(rackPriorities);
         });
+        dialogContainer.add(dialogScrollPane);
         dialogContainer.add(cancel);
         dialogContainer.add(run);
         modalDialog.setVisible(true);
@@ -201,7 +207,8 @@ public class GUI {
             progressPanel.add(progressLabels.get(k));
             progressPanel.add(progressBars.get(k));
         }
-        mainPanel.add(progressPanel, BorderLayout.CENTER);
+        JScrollPane scrollProgressPane = new JScrollPane(progressPanel);
+        mainPanel.add(scrollProgressPane, BorderLayout.CENTER);
         mainPanel.updateUI();
     }
 
